@@ -1,5 +1,8 @@
 import discord
 from discord.ext import commands
+import os
+import random
+import requests
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -15,26 +18,27 @@ async def hello(ctx):
     await ctx.send(f'Hola, soy un bot {bot.user}!')
 
 @bot.command()
-async def heh(ctx, count_heh = 5):
-    await ctx.send("he" * count_heh)
+async def mem(ctx):
+    todas_las_imagenes = os.listdir("images")
+    img_name = random.choice(todas_las_imagenes)
+    with open(f'images/{img_name}', 'rb') as f:
+            picture = discord.File(f)
+    await ctx.send(file=picture)
 
-@bot.command()
-async def test(ctx, arg):
-    await ctx.send(arg)
+print(os.listdir('images'))
 
-@bot.command()
-async def add(ctx, a: int, b: int):
-    await ctx.send(a + b)
+def get_duck_image_url():    
+    url = 'https://random-d.uk/api/random'
+    res = requests.get(url)
+    data = res.json()
+    return data['url']
 
-@bot.command()
-async def test2(ctx, *args):
-    arguments = ', '.join(args)
-    await ctx.send(f'{len(args)} arguments: {arguments}')
 
-@bot.command()
-async def joined(ctx, member: discord.Member):
-    """Says when a member joined."""
-    await ctx.send(f'{member.name} joined {discord.utils.format_dt(member.joined_at)}')
-
+@bot.command('duck')
+async def duck(ctx):
+    '''Una vez que llamamos al comando duck, 
+    el programa llama a la función get_duck_image_url'''
+    image_url = get_duck_image_url()
+    await ctx.send(image_url)
 
 bot.run("TU TOKEN")
